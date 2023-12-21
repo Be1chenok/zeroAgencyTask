@@ -5,20 +5,15 @@ networks:
     name: zeroAgencyTask
 
 services:
-#  server:
-#    image: golang:alpine3.18
-#    working_dir: /bin/cmd/app
-#    env_file: 
-#      - .env
-#    volumes: 
-#      - .:/bin
-#    command: go run main.go
-#    ports:
-#      - ${SERVER_PORT}:${SERVER_PORT}
-#    depends_on:
-#      - postgres
-#    networks:
-#      - zeroAgencyTask
+  server:
+    build: .
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - zeroAgencyTask
 
   postgres:
     image: postgres:alpine3.18
@@ -31,4 +26,9 @@ services:
       - ${PG_PORT}:${PG_PORT}
     networks:
       - zeroAgencyTask
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   

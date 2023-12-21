@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS users
+(
+    id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(64) NOT NULl UNIQUE,
+    username VARCHAR(64) NOT NULL UNIQUE,
+    password VARCHAR(72) NOT NULL,
+    registered_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS tokens
+(
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    access_token VARCHAR(256) NOT NULL,
+    refresh_token VARCHAR(256) NOT NULL
+);

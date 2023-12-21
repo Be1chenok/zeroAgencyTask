@@ -7,8 +7,10 @@ import (
 )
 
 type Config struct {
-	Server   ServerConfig
-	Postgres PostgresConfig
+	Server       ServerConfig
+	Postgres     PostgresConfig
+	UserPassword UserPasswordConfig
+	Tokens       TokensConfig
 }
 
 type ServerConfig struct {
@@ -26,6 +28,16 @@ type PostgresConfig struct {
 	Password string
 	DBName   string
 	SSLMode  string
+}
+
+type UserPasswordConfig struct {
+	Salt string
+}
+
+type TokensConfig struct {
+	SigningKey string
+	AccessTTL  time.Duration
+	RefreshTTL time.Duration
 }
 
 func Init() (*Config, error) {
@@ -50,6 +62,14 @@ func Init() (*Config, error) {
 			Password: viper.GetString("PG_PASS"),
 			DBName:   viper.GetString("PG_BASE"),
 			SSLMode:  viper.GetString("PG_SSL_MODE"),
+		},
+		UserPasswordConfig{
+			Salt: viper.GetString("USER_PASSWORD_SALT"),
+		},
+		TokensConfig{
+			SigningKey: viper.GetString("TOKENS_SIGNING_KEY"),
+			AccessTTL:  viper.GetDuration("ACCESS_TOKEN_TTL") * time.Second,
+			RefreshTTL: viper.GetDuration("REFRESH_TOKEN_TTL") * time.Second,
 		},
 	}, nil
 }

@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"github.com/Be1chenok/zeroAgencyTask/internal/config"
-	appHandler "github.com/Be1chenok/zeroAgencyTask/internal/delivery/handler"
-	appServer "github.com/Be1chenok/zeroAgencyTask/internal/delivery/server"
+	appHandler "github.com/Be1chenok/zeroAgencyTask/internal/delivery/http/handler"
+	appServer "github.com/Be1chenok/zeroAgencyTask/internal/delivery/http/server"
 	appLogger "github.com/Be1chenok/zeroAgencyTask/internal/logger"
 	appRepository "github.com/Be1chenok/zeroAgencyTask/internal/repository"
 	"github.com/Be1chenok/zeroAgencyTask/internal/repository/postgres"
 	appService "github.com/Be1chenok/zeroAgencyTask/internal/service"
+	appHasher "github.com/Be1chenok/zeroAgencyTask/pkg/hasher"
 	"go.uber.org/zap"
 )
 
@@ -42,8 +43,10 @@ func Run() {
 	}
 	cancel()
 
+	hasher := appHasher.NewSHA256Hasher(conf.UserPassword.Salt)
+
 	repository := appRepository.New(logger, postgres)
-	service := appService.New(repository, logger)
+	service := appService.New(repository, logger, hasher, conf)
 	handler := appHandler.New(conf, service)
 	server := appServer.New(conf, *handler)
 	server.InitRoutes()
