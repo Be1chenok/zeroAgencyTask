@@ -35,7 +35,12 @@ func (h Handler) GetNewsList(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(ErrSomethingWentWrong.Error())
 	}
 
-	return c.Status(fiber.StatusOK).JSON(&news)
+	response := listNews{
+		Success: true,
+		News:    news,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 func (h Handler) EditNewsById(c *fiber.Ctx) error {
